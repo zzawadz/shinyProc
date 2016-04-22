@@ -11,9 +11,14 @@ filtersUI = function(id) {
 }
 
 
-makeFilters <- function(input, output, session, data, columnsToFilter)
+makeFilters <- function(input, output, session, data, columnsToFilter, defaultFilters = function() NULL)
 {
-  filters = reactiveValues(filters = data_frame(col = character(0), levels = character(0)))
+  filters = reactiveValues(filters = NULL)
+  
+  observeEvent(defaultFilters(),
+  {
+    filters$filters = defaultFilters()
+  })
   
   output$columnToFilterUI = renderUI({
     ns = session$ns
@@ -41,12 +46,31 @@ makeFilters <- function(input, output, session, data, columnsToFilter)
 
   observeEvent(input$RemoveLast,{ 
     if(is.null(data)) return()
+    if(is.null(filters$filters)) return()
     filters$filters = head(filters$filters, -1)
   })
   
   output$filtersTable = renderDataTable({
+    if(is.null(data)) return(data_frame(col = character(0), levels = character(0)))
     filters$filters
   })
   
   return(filters)
 }
+
+
+#'
+#'
+#' @examples 
+#' 
+#' filters = structure(list(col = c("Species", "Species"), levels = c("\"setosa\", \"versicolor\", \"virginica\"", 
+#' "\"versicolor\", \"virginica\"")), .Names = c("col", "levels"
+#' ), row.names = 1:2, class = c("tbl_df", "tbl", "data.frame"))
+#' 
+filters2yaml = function(filters)
+{
+  as.yaml(filters) %>% cat
+}
+
+
+
