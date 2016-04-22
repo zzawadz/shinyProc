@@ -74,6 +74,7 @@ filters2yaml = function(filters)
 
 filterData = function(data, filters)
 {
+  
   if(!is.null(filters) && nrow(filters) > 0)
   {
     flts = sapply(1:nrow(filters), function(i)
@@ -84,7 +85,7 @@ filterData = function(data, filters)
     })
     
     flts = paste0(flts, collapse = " %>% ")
-    code = paste("dt %>% ", flts)
+    code = paste("data %>% ", flts)
     code = parse(text = code)
     data = eval(code)
   }
