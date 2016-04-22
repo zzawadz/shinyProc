@@ -72,5 +72,23 @@ filters2yaml = function(filters)
   as.yaml(filters) %>% cat
 }
 
-
+filterData = function(data, filters)
+{
+  if(!is.null(filters) && nrow(filters) > 0)
+  {
+    flts = sapply(1:nrow(filters), function(i)
+    {
+      col = filters[i,1][[1]]
+      lvl = filters[i,2][[1]]
+      sprintf('filter(%s %%in%% c(%s))', col, lvl)
+    })
+    
+    flts = paste0(flts, collapse = " %>% ")
+    code = paste("dt %>% ", flts)
+    code = parse(text = code)
+    data = eval(code)
+  }
+  
+  data
+}
 
