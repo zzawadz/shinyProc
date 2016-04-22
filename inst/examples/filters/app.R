@@ -1,6 +1,8 @@
 library(shiny)
 library(dplyr)
 library(shinyAce)
+library(DT)
+library(shinyProc)
 
 # Define UI for application that draws a histogram
 ui <- shinyUI(fluidPage(
@@ -18,6 +20,7 @@ ui <- shinyUI(fluidPage(
       
       # Show a plot of the generated distribution
       mainPanel(
+        dataTableOutput("dataFiltered")
       )
    )
 ))
@@ -38,6 +41,10 @@ server <- shinyServer(function(input, output) {
                        defaultFilters = loadedFilters)
   
   observe({ print(filters$filters) })
+  
+  output$dataFiltered = renderDataTable({
+    filterData(iris, filters$filters)
+  })
   
 })
 
