@@ -53,7 +53,7 @@ server <- shinyServer(function(input, output) {
   observe({ print(filters$filters) })
   
   output$dataFiltered = renderDataTable({
-    filterData(iris, filters$filters)
+    filters$filteredData
   })
   
 })

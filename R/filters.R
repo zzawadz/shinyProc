@@ -14,7 +14,7 @@ filtersUI = function(id) {
 
 makeFilters <- function(input, output, session, data, columnsToFilter, sliders = NULL, defaultFilters = function() NULL)
 {
-  filters = reactiveValues(filters = NULL)
+  filters = reactiveValues(filteredData = data, filters = NULL, sliders = NULL)
   
   observeEvent(defaultFilters(),
   {
@@ -79,6 +79,11 @@ makeFilters <- function(input, output, session, data, columnsToFilter, sliders =
     filters$filters
   })
   
+  observe({
+            dt = filterDataByFactors(data, filters$filters)
+            filters$filteredData = dt
+          })
+  
   return(filters)
 }
 
@@ -96,7 +101,7 @@ filters2yaml = function(filters)
   as.yaml(filters) %>% cat
 }
 
-filterData = function(data, filters)
+filterDataByFactors = function(data, filters)
 {
   
   if(!is.null(filters) && nrow(filters) > 0)
