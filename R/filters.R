@@ -3,6 +3,7 @@ filtersUI = function(id) {
   
   tagList(
     tags$style(type='text/css', "#levels { height: 200px; }"),
+    uiOutput(ns("slidersUI")),
     uiOutput(ns("columnToFilterUI")),
     uiOutput(ns("levelsUI")),
     actionButton(ns("makeFilter"), "Filter!"),
@@ -11,7 +12,7 @@ filtersUI = function(id) {
 }
 
 
-makeFilters <- function(input, output, session, data, columnsToFilter, defaultFilters = function() NULL)
+makeFilters <- function(input, output, session, data, columnsToFilter, sliders = NULL, defaultFilters = function() NULL)
 {
   filters = reactiveValues(filters = NULL)
   
@@ -19,6 +20,29 @@ makeFilters <- function(input, output, session, data, columnsToFilter, defaultFi
   {
     filters$filters = defaultFilters()
   })
+  
+  ######## Sliders
+  
+  output$slidersUI = renderUI({
+    
+    if(is.null(sliders)) return(NULL)
+    ns = session$ns
+    
+    iter = counter()
+    
+    lapply(sliders, function(sl)
+    {
+      sliderInput(ns(paste0("slider", iter())), 
+                  label = sl$label, 
+                  min = sl$min, 
+                  max = sl$max, 
+                  value = sl$value, 
+                  step = sl$step)
+    })
+    
+  })
+  
+  ######## Factors filters
   
   output$columnToFilterUI = renderUI({
     ns = session$ns
