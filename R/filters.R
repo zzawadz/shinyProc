@@ -14,7 +14,7 @@ filtersUI = function(id) {
 
 makeFilters <- function(input, output, session, data, columnsToFilter, sliders = NULL, defaultFilters = function() NULL)
 {
-  filters = reactiveValues(filteredData = data, filters = NULL, sliders = NULL)
+  filters = reactiveValues(filteredData = data, filters = NULL, sliders = list())
   
   observeEvent(defaultFilters(),
   {
@@ -29,17 +29,35 @@ makeFilters <- function(input, output, session, data, columnsToFilter, sliders =
     ns = session$ns
     
     iter = counter()
+    slNameIt = iterator(names(sliders))
     
     lapply(sliders, function(sl)
     {
-      sliderInput(ns(paste0("slider", iter())), 
+      sliderId = paste0("slider", iter())
+      isolate({ filters$sliders[[sliderId]] = list(columnName = slNameIt(),
+                                           value = sl$value,
+                                           range = c(sl$min, sl$max))
+              })
+      
+      sliderInput(ns(sliderId), 
                   label = sl$label, 
                   min = sl$min, 
                   max = sl$max, 
                   value = sl$value, 
                   step = sl$step)
+      
+
     })
     
+  })
+  
+  observe({
+    slidersIds = isolate(names(filters$sliders))
+    lapply(slidersIds, function(id)
+    {
+      value = input[[id]]
+      isolate({ filters$sliders[[id]]$value = value })
+    })
   })
   
   ######## Factors filters
@@ -81,7 +99,11 @@ makeFilters <- function(input, output, session, data, columnsToFilter, sliders =
   
   observe({
             dt = filterDataByFactors(data, filters$filters)
+            dt = filterDataBySliders(dt, filters$sliders)
+            
             filters$filteredData = dt
+            
+            
           })
   
   return(filters)
@@ -122,3 +144,27 @@ filterDataByFactors = function(data, filters)
   data
 }
 
+filterDataBySliders = function(data, sliders)
+{
+  if(length(sliders) == 0) return(data)
+  
+  expr = NULL
+  
+  for(sl in sliders)
+  {
+    if(is.null(sl$value)) next;
+    if(all(sl$value == sl$range)) next;
+    
+    tmpCode = sprintf("%s >= %s, %s <= %s", sl$columnName, sl$value[1], sl$columnName, sl$value[2])
+    expr = paste(expr, tmpCode,  sep  = ",")
+  }
+  
+  if(is.null(expr)) return(data)
+  
+  expr = substring(expr, 2)
+  
+  code = paste("data %>% ", sprintf("filter(%s)",expr))
+  code = parse(text = code)
+  data = eval(code)
+  data
+}
