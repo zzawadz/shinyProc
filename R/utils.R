@@ -8,3 +8,16 @@ counter = function()
   }
   
 }
+
+iterator = function(x)
+{
+  x = force(x)
+  i = 0
+  function()
+  {
+    i <<- i + 1;
+    x[i]
+  }
+  
+}
+
