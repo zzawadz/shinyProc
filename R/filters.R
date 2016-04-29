@@ -16,6 +16,8 @@ makeFilters <- function(input, output, session, data, columnsToFilter, sliders =
 {
   filters = reactiveValues(filteredData = data, filters = NULL, sliders = list())
   
+  status = reactiveValues(slidersCreated = FALSE)
+  
   observeEvent(defaultFilters(),
   {
     filters$filters = defaultFilters()
@@ -25,13 +27,15 @@ makeFilters <- function(input, output, session, data, columnsToFilter, sliders =
   
   output$slidersUI = renderUI({
     
+    flog.trace("Entering slidersUI.")
+    
     if(is.null(sliders)) return(NULL)
     ns = session$ns
     
     iter = counter()
     slNameIt = iterator(names(sliders))
     
-    lapply(sliders, function(sl)
+    slAll = lapply(sliders, function(sl)
     {
       sliderId = paste0("slider", iter())
       columnName = slNameIt()
@@ -68,15 +72,25 @@ makeFilters <- function(input, output, session, data, columnsToFilter, sliders =
 
     })
     
+    flog.trace("Exiting slidersUI.")
+    status$slidersCreated = TRUE
+    
+    return(slAll)
   })
   
   observe({
+    
+    flog.trace("Entering sliders value update.")
+    if(!status$slidersCreated) return()
+    
     slidersIds = isolate(names(filters$sliders))
+    
     lapply(slidersIds, function(id)
     {
       value = input[[id]]
       isolate({ filters$sliders[[id]]$value = value })
     })
+    flog.trace("Exiting sliders value update.")
   })
   
   ######## Factors filters
@@ -166,7 +180,7 @@ filterDataByFactors = function(data, filters)
 filterDataBySliders = function(data, sliders)
 {
   if(length(sliders) == 0) return(data)
-  
+  flog.trace("Entering filterDataBySliders.")
   expr = NULL
   
   for(sl in sliders)
@@ -185,5 +199,7 @@ filterDataBySliders = function(data, sliders)
   code = paste("data %>% ", sprintf("filter(%s)",expr))
   code = parse(text = code)
   data = eval(code)
+  
+  flog.trace("Exiting filterDataBySliders.")
   data
 }
