@@ -39,14 +39,8 @@ server <- shinyServer(function(input, output) {
                        data = iris, 
                        columnsToFilter = "Species",
                        sliders = list("Sepal.Width" = list(label = "Sepal.Width", 
-                                                           min   = min(iris$Sepal.Width), 
-                                                           max   = max(iris$Sepal.Width), 
-                                                           value = range(iris$Sepal.Width), 
                                                            step = 0.1),
-                                      "Sepal.Length" = list(label = "Sepal.Length", 
-                                                           min   = min(iris$Sepal.Length), 
-                                                           max   = max(iris$Sepal.Length), 
-                                                           value = range(iris$Sepal.Length), 
+                                      "Sepal.Length" = list(label = "Sepal.Length",
                                                            step = 0.1)),
                        defaultFilters = loadedFilters)
   

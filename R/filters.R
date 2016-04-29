@@ -34,16 +34,35 @@ makeFilters <- function(input, output, session, data, columnsToFilter, sliders =
     lapply(sliders, function(sl)
     {
       sliderId = paste0("slider", iter())
-      isolate({ filters$sliders[[sliderId]] = list(columnName = slNameIt(),
+      columnName = slNameIt()
+      
+      if(is.null(sl$range))
+      {
+        range = range(data[[columnName]], na.rm = TRUE)
+      } else
+      {
+        range = sl$range
+      }
+      
+      if(is.null(sl$value))
+      {
+        value = range
+      } else
+      {
+        value = sl$value
+      }
+      
+      isolate({ filters$sliders[[sliderId]] = list(columnName = columnName,
                                            value = sl$value,
-                                           range = c(sl$min, sl$max))
+                                           range = range)
               })
+      
       
       sliderInput(ns(sliderId), 
                   label = sl$label, 
-                  min = sl$min, 
-                  max = sl$max, 
-                  value = sl$value, 
+                  min = range[[1]], 
+                  max = range[[2]], 
+                  value = value, 
                   step = sl$step)
       
 
