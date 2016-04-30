@@ -11,7 +11,7 @@ ggFacetGridUI = function(id) {
 
 ggMakeFacetGrid = function(input, output, session, columns)
 {
-  values = reactiveValues(gridCol = "None", gridRow = "None", call = NULL)
+  values = reactiveValues(gridCol = "None", gridRow = "None", call = function(p) return(p))
   status = reactiveValues(rowReady = FALSE, colReady = FALSE)
   
   output$gridRowUI = renderUI({
@@ -50,6 +50,8 @@ ggMakeFacetGrid = function(input, output, session, columns)
       if(input$gridCol == "None" && input$gridRow == "None")
       {
         flog.trace("[FacetGrid] Exiting observer. Both values is NONE.")
+        
+        values$call = function(p) return(p)
         return()
       }
       
@@ -64,7 +66,9 @@ ggMakeFacetGrid = function(input, output, session, columns)
       
       values$gridCol = col
       values$gridRow = row
-      values$call = call
+      values$call = function(p) { p + facet_grid(call) }
+      
+      
       
       flog.trace(sprintf("[FacetGrid] Exiting observer. Values updated. Row: %s, Col: %s", input$gridRow, input$gridCol))
       

@@ -27,9 +27,8 @@ server <- shinyServer(function(input, output) {
     
     p = ggplot(mtcars, aes(mpg, disp)) + geom_point()
     
-    
-    if(!is.null(facetGrid$call))
-      p = p + facet_grid(facetGrid$call)
+    p = facetGrid$call(p)
+      
     
     return(p)
   })
