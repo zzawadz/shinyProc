@@ -1,11 +1,9 @@
 library(shiny)
 library(ggplot2)
 
-# Define UI for application that draws a histogram
 ui <- shinyUI(fluidPage(
    
-   # Application title
-   titlePanel("Old Faithful Geyser Data"),
+   titlePanel("Facets module for ggplot2"),
    
    sidebarLayout(
       sidebarPanel(
