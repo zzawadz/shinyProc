@@ -14,7 +14,7 @@ filtersUI = function(id) {
 
 makeFilters <- function(input, output, session, data, columnsToFilter, sliders = NULL, defaultFilters = function() NULL)
 {
-  filters = reactiveValues(filteredData = data, filters = NULL, sliders = list())
+  filters = reactiveValues(filters = NULL, sliders = list(), call = function(data) data)
   
   status = reactiveValues(slidersCreated = FALSE)
   
@@ -131,10 +131,18 @@ makeFilters <- function(input, output, session, data, columnsToFilter, sliders =
   })
   
   observe({
-            dt = filterDataByFactors(data, filters$filters)
-            dt = filterDataBySliders(dt, filters$sliders)
+    
+            defData = data        
+    
+            fnc = function(data = defData)
+            {
+              dt = filterDataByFactors(data, filters$filters)
+              dt = filterDataBySliders(dt, filters$sliders)
+              return(dt)
+            }
             
-            filters$filteredData = dt
+            
+            filters$call = fnc
             
             
           })
