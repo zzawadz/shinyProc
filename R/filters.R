@@ -27,7 +27,7 @@ makeFilters <- function(input, output, session, data, columnsToFilter, sliders =
   
   output$slidersUI = renderUI({
     
-    flog.trace("Entering slidersUI.")
+    flog.trace("[FILTER] Entering slidersUI.")
     
     if(is.null(sliders)) return(NULL)
     ns = session$ns
@@ -72,7 +72,7 @@ makeFilters <- function(input, output, session, data, columnsToFilter, sliders =
 
     })
     
-    flog.trace("Exiting slidersUI.")
+    flog.trace("[FILTER] Exiting slidersUI.")
     status$slidersCreated = TRUE
     
     return(slAll)
@@ -80,8 +80,9 @@ makeFilters <- function(input, output, session, data, columnsToFilter, sliders =
   
   observe({
     
-    flog.trace("Entering sliders value update.")
     if(!status$slidersCreated) return()
+    
+    flog.trace("[FILTER] Entering sliders value update.")
     
     slidersIds = isolate(names(filters$sliders))
     
@@ -90,7 +91,7 @@ makeFilters <- function(input, output, session, data, columnsToFilter, sliders =
       value = input[[id]]
       isolate({ filters$sliders[[id]]$value = value })
     })
-    flog.trace("Exiting sliders value update.")
+    flog.trace("[FILTER] Exiting sliders value update.")
   })
   
   ######## Factors filters
