@@ -37,6 +37,35 @@ fillZeroBars = function(dt, X, fill, call = NULL)
   return(dtx)
 }
 
+groupByFacet = function(dt, x, fill, call = NULL)
+{
+  if(!is.null(call))
+  {
+    gridNames = as.character(call)
+    gridNames = gridNames[!(gridNames %in% c("~","."))]
+  } else
+  {
+    gridNames = character()
+  }
+  
+  if(fill == "None") fill = x
+  
+  if(length(gridNames) == 0)
+  {
+    dtx = dt %>% group_by_(x, fill)
+    
+  } else if(length(gridNames) == 1)
+  {
+    dtx = dt %>% group_by_(x, fill, gridNames[[1]])
+  } else if(length(gridNames) == 2)
+  {
+    dtx = dt %>% group_by_(x, fill, gridNames[[1]], gridNames[[2]])
+  }
+  
+  return(dtx)
+  
+}
+
 ggFacetGridUI = function(id) {
   ns = NS(id)
   
@@ -50,7 +79,7 @@ ggFacetGridUI = function(id) {
 
 ggMakeFacetGrid = function(input, output, session, columns)
 {
-  values = reactiveValues(gridCol = "None", gridRow = "None", call = function(p) return(p), fillZeroBars = fillZeroBars )
+  values = reactiveValues(gridCol = "None", gridRow = "None", call = function(p) return(p), fillZeroBars = fillZeroBars, groupByFacet = groupByFacet)
   status = reactiveValues(rowReady = FALSE, colReady = FALSE)
   
   output$gridRowUI = renderUI({
@@ -107,7 +136,7 @@ ggMakeFacetGrid = function(input, output, session, columns)
       values$gridRow = row
       values$call = function(p) { p + facet_grid(call) }
       values$fillZeroBars = function(dt, X, fill) fillZeroBars(dt, X, fill, call = call)
-      
+      values$groupByFacet = function(data, x, fill) groupByFacet(data, x, fill, call = call)
       
       flog.trace(sprintf("[FacetGrid] Exiting observer. Values updated. Row: %s, Col: %s", input$gridRow, input$gridCol))
       
