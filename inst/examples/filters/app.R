@@ -4,6 +4,13 @@ library(shinyAce)
 library(DT)
 library(shinyProc)
 
+tmpVals = structure(list(col = c("Species", "Species"), levels = c("\"setosa\", \"versicolor\", \"virginica\"", 
+                                                         "\"versicolor\", \"virginica\"")), .Names = c("col", "levels"
+                                                         ), row.names = 1:2, class = c("tbl_df", "tbl", "data.frame"))
+yamlTmp = as.yaml(list(Filters = tmpVals))
+
+flog.threshold(TRACE)
+
 # Define UI for application that draws a histogram
 ui <- shinyUI(fluidPage(
    
@@ -15,12 +22,14 @@ ui <- shinyUI(fluidPage(
       sidebarPanel(
         
         actionButton("loadFilters", "Load filters"),
+        actionButton("loadFiltersFromAce", "Load filters from TextEditor"),
         filtersUI("filters")
       ),
       
       # Show a plot of the generated distribution
       mainPanel(
-        dataTableOutput("dataFiltered")
+          dataTableOutput("dataFiltered"),
+          aceEditor(outputId = "editor", mode = "r", value = yamlTmp)
       )
    )
 ))
@@ -28,11 +37,32 @@ ui <- shinyUI(fluidPage(
 # Define server logic required to draw a histogram
 server <- shinyServer(function(input, output) {
   
-  loadedFilters = eventReactive(input$loadFilters,
+  flt = reactiveValues(flt = NULL)
+  
+  observeEvent(input$loadFilters,
+   {
+     flog.trace("Update Load Button")
+     flt$flt = structure(list(col = c("Species", "Species"), levels = c("\"setosa\", \"versicolor\", \"virginica\"", 
+                                                              "\"versicolor\", \"virginica\"")), .Names = c("col", "levels"
+                                                              ), row.names = 1:2, class = c("tbl_df", "tbl", "data.frame"))
+   })
+  
+  observeEvent(input$loadFiltersFromAce,
+               {
+                 flog.trace("Update ACE")
+                 tmp = yaml.load(input$editor)$Filters
+                 flt$flt = as_data_frame(tmp)
+               })
+  
+  
+  
+  
+  loadedFilters = reactive(
   {
-    structure(list(col = c("Species", "Species"), levels = c("\"setosa\", \"versicolor\", \"virginica\"", 
-                 "\"versicolor\", \"virginica\"")), .Names = c("col", "levels"
-                  ), row.names = 1:2, class = c("tbl_df", "tbl", "data.frame"))
+    input$loadFiltersFromAce
+    input$loadFilters
+    flog.trace("Update loadedFilters")
+    flt$flt
   })
   
   filters = callModule(makeFilters,"filters", 
