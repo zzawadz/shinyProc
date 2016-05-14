@@ -77,7 +77,7 @@ ggFacetGridUI = function(id) {
     )))
 }
 
-ggMakeFacetGrid = function(input, output, session, columns)
+ggMakeFacetGrid = function(input, output, session, columns, init = emptyListFnc)
 {
   values = reactiveValues(gridCol = "None", gridRow = "None", call = function(p) return(p), fillZeroBars = fillZeroBars, groupByFacet = groupByFacet)
   status = reactiveValues(rowReady = FALSE, colReady = FALSE)
@@ -85,14 +85,14 @@ ggMakeFacetGrid = function(input, output, session, columns)
   output$gridRowUI = renderUI({
     ns = session$ns
     status$rowReady = TRUE
-    ui = radioButtons(ns("gridRow"), "Grid row", c("None", columns))
+    ui = radioButtons(ns("gridRow"), "Grid row", c("None", columns), selected = init()$row)
     return(ui)
   })
   
   output$gridColUI = renderUI({
     ns = session$ns
     status$colReady = TRUE
-    ui = radioButtons(ns("gridCol"), "Grid col", c("None", columns))
+    ui = radioButtons(ns("gridCol"), "Grid col", c("None", columns), selected = init()$col)
     return(ui)
   })
   
