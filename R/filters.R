@@ -98,6 +98,7 @@ makeFilters <- function(input, output, session, data, columnsToFilter, sliders =
   
   output$columnToFilterUI = renderUI({
     ns = session$ns
+    
     selectInput(ns("columnToFilter"), "Column to filter", choices = columnsToFilter, selected = columnsToFilter[1])
   })
   
@@ -174,7 +175,7 @@ filterDataByFactors = function(data, filters)
     {
       col = filters[i,1][[1]]
       lvl = filters[i,2][[1]]
-      sprintf('filter(%s %%in%% c(%s))', col, lvl)
+      sprintf('filter(`%s` %%in%% c(%s))', col, lvl)
     })
     
     flts = paste0(flts, collapse = " %>% ")
