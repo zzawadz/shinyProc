@@ -6,9 +6,10 @@ ggThemeParamsUI = function(id) {
   tagList(selectInput(ns("legendPosition"), "Legend position:",
                       choices = c("none", "left", "right", "bottom", "top"),
                       selected = "bottom"),
+          sliderInput(ns("fontSizePlot"), label = "Font size:", min = 0, max = 36, value = 4, step = 1),
           sliderInput(ns("fontSizeSmall"), label = "Font size small:", min = 9, max = 36, value = 16, step = 1),
           sliderInput(ns("fontSizeLarge"), label = "Font size large:", min = 9, max = 36, value = 24, step = 1),
-          selectInput(ns("xaxisTextAngle"), label = "X-axis text angle",choices = c("45","90"),selected = "45"),
+          sliderInput(ns("xaxisTextAngle"), label = "X-axis text angle",value = 45, min = 45, max = 90, step = 1),
           numericInput(ns("leftMargin"), min = 4.5, label = "Left margin:", value = 5.5, step = 0.1)
   )
 }
@@ -22,23 +23,17 @@ ggMakeThemeParams = function(input, output, session)
                           plot.margin = theme(plot.margin = margin(5.5,5.5,5.5, 5.5))
                           )
   
-  call = reactiveValues(call = function(p) { return(p) })
+  call = reactiveValues(call = function(p) { return(p) }, textFontSize = 4)
   
    
   # text angle
   observe({
 
-    if(input$xaxisTextAngle == "45")
-    {
-      themes$axis.text.x = theme(axis.text.x = element_text(angle = 45, 
-                                                            vjust = 1, 
+    f = function(x) x*(-0.5/45) + 1.5
+    val = f(as.numeric(input$xaxisTextAngle))
+    themes$axis.text.x = theme(axis.text.x = element_text(angle = input$xaxisTextAngle, 
+                                                            vjust = val, 
                                                             hjust=1))
-
-    } else {
-      themes$axis.text.x = theme(axis.text.x = element_text(angle = 90, 
-                                                            vjust = 0.5, 
-                                                            hjust=1))
-    }
   })
   
   # font size
@@ -73,6 +68,10 @@ ggMakeThemeParams = function(input, output, session)
     
     call$call = fnc
     
+  })
+  
+  observe({
+    call$textFontSize = input$fontSizePlot
   })
   
   

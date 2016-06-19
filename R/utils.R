@@ -23,3 +23,5 @@ iterator = function(x)
 
 nullFnc = function() NULL
 emptyListFnc = function() list()
+
+emptyString = function() ""
