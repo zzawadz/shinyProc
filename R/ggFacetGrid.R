@@ -11,28 +11,16 @@ fillZeroBars = function(dt, X, fill, call = NULL)
     gridNames = character()
   }
   
+  if(fill == "None") fill = NULL
   
-  if(length(gridNames) == 0)
-  {
-    dtx = dt %>% group_by_(X, fill) %>% summarise(count = n())
-    dtx2 = expand.grid(unique(dtx[[1]]), unique(dtx[[2]]))
-    
-  } else if(length(gridNames) == 1)
-  {
-    dtx = dt %>% group_by_(X, fill, gridNames[[1]]) %>% summarise(count = n())
-    dtx2 = expand.grid(unique(dtx[[1]]), unique(dtx[[2]]), unique(dtx[[3]]))
-    
-  } else if(length(gridNames) == 2)
-  {
-    dtx = dt %>% group_by_(X, fill, gridNames[[1]], gridNames[[2]]) %>% summarise(count = n())
-    dtx2 = expand.grid(unique(dtx[[1]]), unique(dtx[[2]]), unique(dtx[[3]]), unique(dtx[[4]]))
-    
-  }
+  groupArgs = unique(c(X, fill, gridNames))
   
-  colnames(dtx2) = head(colnames(dtx),-1)
+  summaryData = do.call(group_by_, c(list(dt), lapply(groupArgs, function(x) x))) %>% summarise(count = n())
+  levelsGrid = do.call(expand.grid, lapply(summaryData %>% select(-count), function(x) unique(x)))
   
+  colnames(levelsGrid) = head(colnames(summaryData),-1)
   
-  dtx = suppressWarnings(full_join(dtx, dtx2))
+  dtx = suppressWarnings(full_join(summaryData, levelsGrid))
   dtx$count[is.na(dtx$count)] = 0
   return(dtx)
 }
