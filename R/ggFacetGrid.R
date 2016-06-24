@@ -15,8 +15,11 @@ fillZeroBars = function(dt, X, fill, call = NULL)
   
   groupArgs = unique(c(X, fill, gridNames))
   
-  summaryData = do.call(group_by_, c(list(dt), lapply(groupArgs, function(x) x))) %>% summarise(count = n())
-  levelsGrid = do.call(expand.grid, lapply(summaryData %>% select(-count), function(x) unique(x)))
+  summaryData = do.call(group_by_, 
+                        c(list(dt), lapply(groupArgs, function(x) x))) %>% 
+                        summarise(count = n())
+  levelsGrid = do.call(expand.grid, 
+                       lapply(summaryData %>% select(-count), function(x) unique(x)))
   
   colnames(levelsGrid) = head(colnames(summaryData),-1)
   
