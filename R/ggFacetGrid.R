@@ -39,19 +39,13 @@ groupByFacet = function(dt, x, fill, call = NULL)
     gridNames = character()
   }
   
-  if(fill == "None") fill = x
+  if(fill == "None") fill = NULL
+  if(x    == "None") x = NULL
   
-  if(length(gridNames) == 0)
-  {
-    dtx = dt %>% group_by_(x, fill)
-    
-  } else if(length(gridNames) == 1)
-  {
-    dtx = dt %>% group_by_(x, fill, gridNames[[1]])
-  } else if(length(gridNames) == 2)
-  {
-    dtx = dt %>% group_by_(x, fill, gridNames[[1]], gridNames[[2]])
-  }
+  dtx = do.call(group_by_, 
+          c(list(dt),x,fill,gridNames))
+  
+  
   
   return(dtx)
   
