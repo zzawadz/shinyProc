@@ -105,6 +105,12 @@ ggMakeFacetGrid = function(input, output, session, columns, init = emptyListFnc)
         flog.trace("[FacetGrid] Exiting observer. Both values is NONE.")
         
         values$call = function(p) return(p)
+        values$gridCol = ""
+        values$gridRow = ""
+        
+        call = NULL   
+        values$fillZeroBars = function(dt, X, fill) fillZeroBars(dt, X, fill, call = call)
+        
         return()
       }
       
