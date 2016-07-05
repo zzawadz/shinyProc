@@ -23,7 +23,7 @@ server <- shinyServer(function(input, output) {
   output$plot <- renderPlot({
     data("mtcars")
     
-    p = ggplot(mtcars, aes(mpg, disp, fill = cyl)) + geom_point()
+    p = ggplot(mtcars, aes(mpg, disp, fill = cyl)) + geom_point(size = themes$pointSize)
     p = themes$call(p)
     
     return(p)
