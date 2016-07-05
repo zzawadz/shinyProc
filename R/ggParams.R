@@ -3,15 +3,19 @@
 ggThemeParamsUI = function(id) {
   ns = NS(id)
   
-  tagList(selectInput(ns("legendPosition"), "Legend position:",
+  tagList(
+    fluidRow(
+    selectInput(ns("legendPosition"), "Legend position:",
                       choices = c("none", "left", "right", "bottom", "top"),
                       selected = "bottom"),
-          sliderInput(ns("fontSizePlot"), label = "Font size:", min = 0, max = 36, value = 4, step = 1),
-          sliderInput(ns("fontSizeSmall"), label = "Font size small:", min = 9, max = 36, value = 16, step = 1),
-          sliderInput(ns("fontSizeLarge"), label = "Font size large:", min = 9, max = 36, value = 24, step = 1),
-          sliderInput(ns("xaxisTextAngle"), label = "X-axis text angle",value = 45, min = 45, max = 90, step = 1),
-          numericInput(ns("leftMargin"), min = 4.5, label = "Left margin:", value = 5.5, step = 0.1)
-  )
+          column(6,sliderInput(ns("fontSizePlot"), label = "Font size:", min = 0, max = 36, value = 4, step = 1)),
+          column(6, sliderInput(ns("fontSizeSmall"), label = "Font size small:", min = 9, max = 36, value = 16, step = 1)),
+           column(6, sliderInput(ns("fontSizeLarge"), label = "Font size large:", min = 9, max = 36, value = 24, step = 1)),
+            column(6, sliderInput(ns("xaxisTextAngle"), label = "X-axis text angle",value = 45, min = 45, max = 90, step = 1)),
+            column(6, numericInput(ns("leftMargin"), min = 4.5, label = "Left margin:", value = 5.5, step = 0.1)),
+            column(6, sliderInput(ns("pointSize"), label = "Point size",value = 2, min = 0.1, max = 5, step = 0.1))
+          
+  ))
 }
 
 ggMakeThemeParams = function(input, output, session)
@@ -23,7 +27,7 @@ ggMakeThemeParams = function(input, output, session)
                           plot.margin = theme(plot.margin = margin(5.5,5.5,5.5, 5.5))
                           )
   
-  call = reactiveValues(call = function(p) { return(p) }, textFontSize = 4)
+  call = reactiveValues(call = function(p) { return(p) }, textFontSize = 4, pointSize = 2)
   
    
   # text angle
@@ -73,6 +77,13 @@ ggMakeThemeParams = function(input, output, session)
   observe({
     call$textFontSize = input$fontSizePlot
   })
+  
+  observe({
+    call$pointSize = input$pointSize
+  })
+  
+  
+  
   
   
   return(call)
